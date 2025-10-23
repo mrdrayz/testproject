@@ -4,9 +4,10 @@ import { TodoItem } from '../Components/TodoList/TodoItem';
 import { TodoForm } from '../Components/TodoList/TodoForm';
 
 export const TodoPage: React.FC = () => {
-  const { todos, loading, error, addTodo, toggleTodo, deleteTodo, filter, setFilter } = useTodos();
+  const { todos, loading, error, addTodo, toggleTodo, deleteTodo, editTodo, filter, setFilter } = useTodos(); 
 
   if (loading) return <div className="text-center py-10">Loading...</div>;
+
   if (error) return <div className="text-center text-red-500 py-10">{error}</div>;
 
   return (
@@ -22,12 +23,14 @@ export const TodoPage: React.FC = () => {
         >
           All
         </button>
+
         <button
           onClick={() => setFilter('active')}
           className={filter === 'active' ? 'font-bold text-blue-500' : 'text-gray-500 hover:text-blue-300'}
         >
           Active
         </button>
+        
         <button
           onClick={() => setFilter('completed')}
           className={filter === 'completed' ? 'font-bold text-blue-500' : 'text-gray-500 hover:text-blue-300'}
@@ -44,6 +47,7 @@ export const TodoPage: React.FC = () => {
               todo={todo}
               onToggle={toggleTodo}
               onDelete={deleteTodo}
+              onEdit={editTodo}
             />
           ))
         ) : (

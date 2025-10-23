@@ -12,8 +12,15 @@ export const useTodos = () => {
     const fetchTodos = async () => {
       try {
         setLoading(true);
+        
         const response = await api.getTodos();
-        setTodos(response.data.todos);
+
+        if (response.data && response.data.todos) {
+          const initialTodos = response.data.todos.map(todo => ({ ...todo, isLocal: false }));
+          setTodos(initialTodos);
+        } else {
+          throw new Error('Invalid API response format');
+        }
       } catch (err: any) {
         setError(err.message || 'Failed to fetch todos');
       } finally {
@@ -26,46 +33,57 @@ export const useTodos = () => {
 
   const filteredTodos = todos.filter(todo => {
     if (filter === 'active') return !todo.completed;
+
     if (filter === 'completed') return todo.completed;
+
     return true;
   });
 
-  const addTodo = async (text: string) => {
-    try {
-      const newTodo = {
-        todo: text,
-        completed: false,
-        userId: 1,
-      };
-      const response = await api.createTodo(newTodo);
-      setTodos([response.data, ...todos]);
-    } catch (err: any) {
-      setError(err.message || 'Failed to add todo');
-    }
+  const addTodo = (text: string) => {
+    const newTodo: Todo = {
+      id: Date.now(), 
+      todo: text,
+      completed: false,
+      userId: 1,
+      isLocal: true, 
+    };
+
+    setTodos([newTodo, ...todos]);
   };
 
-  const toggleTodo = async (id: number) => {
-    const todo = todos.find(t => t.id === id);
-    if (!todo) return;
+  const toggleTodo = (id: number) => {
+    setTodos(prevTodos =>
+      prevTodos.map(todo => {
+        if (todo.id === id) {
+          if (todo.isLocal) {
+            return { ...todo, completed: !todo.completed };
+          }
 
-    try {
-      const response = await api.updateTodo(id, { completed: !todo.completed });
-      setTodos(todos.map(t => (t.id === id ? response.data : t)));
-    } catch (err) {
-      console.warn('Update failed, but we will update locally');
-      setTodos(todos.map(t => (t.id === id ? { ...t, completed: !t.completed } : t)));
-    }
+          return { ...todo, completed: !todo.completed };
+        }
+
+        return todo;
+      })
+    );
   };
 
-  const deleteTodo = async (id: number) => {
-    try {
-      await api.deleteTodo(id);
-      setTodos(todos.filter(t => t.id !== id));
-    } catch (err) {
-      console.warn('Delete failed, but we will remove locally');
-      setTodos(todos.filter(t => t.id !== id));
-    }
+  const editTodo = (id: number, newText: string) => {
+    if (newText.trim().length === 0) return; 
+
+    setTodos(prevTodos =>
+      prevTodos.map(todo => {
+        if (todo.id === id) {
+          return { ...todo, todo: newText.trim() };
+        }
+        
+        return todo;
+      })
+    );
   };
 
-  return { todos: filteredTodos, loading, error, addTodo, toggleTodo, deleteTodo, filter, setFilter };
+  const deleteTodo = (id: number) => {
+    setTodos(prevTodos => prevTodos.filter(todo => todo.id !== id));
+  };
+
+  return { todos: filteredTodos, loading, error, addTodo, toggleTodo, deleteTodo, editTodo, filter, setFilter };
 };
