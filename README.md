@@ -23,7 +23,11 @@ cd todo-react
 # Установить зависимости
 npm install
 npm install -D tailwindcss@3.4.14 postcss autoprefixer
+npm install react-icons@4.12.0
 npm install axios
 
 # Запустить локально
 npm start
+
+## 🌐 Деплой
+[Ссылка на опубликованное приложение](https://todolist-alpha-sage.vercel.app/)
