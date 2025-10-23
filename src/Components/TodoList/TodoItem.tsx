@@ -43,7 +43,7 @@ export const TodoItem: React.FC<Props> = ({ todo, onToggle, onDelete, onEdit }) 
           type="checkbox"
           checked={todo.completed}
           onChange={() => onToggle(todo.id)}
-          className="mr-3 h-5 w-5"
+          className="mr-3 h-5 w-5 transform hover:scale-105 transition-transform"
         />
         
         {isEditing ? (
@@ -67,7 +67,7 @@ export const TodoItem: React.FC<Props> = ({ todo, onToggle, onDelete, onEdit }) 
           <>
             <button
               onClick={handleSave}
-              className="w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center hover:bg-green-600 transition-all transform hover:scale-110"
+              className="p-1 text-green-500 hover:text-gray-700 transition-colors transform hover:scale-105 transition-transform"
               title="Save"
             >
               ✓
@@ -75,32 +75,32 @@ export const TodoItem: React.FC<Props> = ({ todo, onToggle, onDelete, onEdit }) 
 
             <button
               onClick={handleCancel}
-              className="w-8 h-8 bg-gray-300 text-gray-700 rounded-full flex items-center justify-center hover:bg-gray-400 transition-all transform hover:scale-110"
+              className="p-1 text-red-500 hover:text-gray-700 transition-colors transform hover:scale-105 transition-transform"
               title="Cancel"
             >
               ✕
             </button>
-          </>
-        ) : (
-          <>
-            <button
-              onClick={handleEdit}
-              className="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center hover:bg-blue-200 transition-all transform hover:scale-110"
-              title="Edit"
-            >
-              ✏️
-            </button>
+        </>
+      ) : (
+        <>
+          <button
+            onClick={handleEdit}
+            className="p-1 text-blue-600 hover:text-gray-700 transition-colors transform hover:scale-105 transition-transform"
+            title="Edit"
+          >
+            <Icon.FiEdit className="w-4 h-4" />
+          </button>
 
-            <button
-              onClick={() => onDelete(todo.id)}
-              className="w-8 h-8 bg-red-100 text-red-600 rounded-full flex items-center justify-center hover:bg-red-200 transition-all transform hover:scale-110"
-              title="Delete"
-            >
-              🗑️
-            </button>
-          </>
-        )}
-      </div>
+          <button
+            onClick={() => onDelete(todo.id)}
+            className="p-1 text-red-500 hover:text-gray-700 transition-colors transform hover:scale-105 transition-transform"
+            title="Delete"
+          >
+            <Icon.FiTrash2 className="w-4 h-4" />
+          </button>
+        </>
+      )}
+    </div>
     </li>
   );
 };

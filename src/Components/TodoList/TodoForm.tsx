@@ -39,7 +39,7 @@ export const TodoForm: React.FC<Props> = ({ onAdd }) => {
         type="submit"
         className="bg-blue-500 text-white p-3 rounded-r-lg hover:bg-blue-600 flex items-center"
       >
-        Add
+        Add 
       </button>
     </form>
   );

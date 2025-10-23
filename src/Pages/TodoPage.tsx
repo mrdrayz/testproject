@@ -19,21 +19,21 @@ export const TodoPage: React.FC = () => {
       <div className="flex justify-center space-x-4 mb-6">
         <button
           onClick={() => setFilter('all')}
-          className={filter === 'all' ? 'font-bold text-blue-500' : 'text-gray-500 hover:text-blue-300'}
+          className={filter === 'all' ? 'font-bold text-blue-500' : 'text-gray-500 hover:text-blue-300 transform hover:scale-105 transition-transform'}
         >
           All
         </button>
 
         <button
           onClick={() => setFilter('active')}
-          className={filter === 'active' ? 'font-bold text-blue-500' : 'text-gray-500 hover:text-blue-300'}
+          className={filter === 'active' ? 'font-bold text-blue-500' : 'text-gray-500 hover:text-blue-300 transform hover:scale-105 transition-transform'}
         >
           Active
         </button>
         
         <button
           onClick={() => setFilter('completed')}
-          className={filter === 'completed' ? 'font-bold text-blue-500' : 'text-gray-500 hover:text-blue-300'}
+          className={filter === 'completed' ? 'font-bold text-blue-500' : 'text-gray-500 hover:text-blue-300 transform hover:scale-105 transition-transform' }
         >
           Completed
         </button>
