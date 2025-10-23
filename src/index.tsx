@@ -11,5 +11,5 @@ if (document.getElementById('root')) {
     </React.StrictMode>
   );
 } else {
-  console.error('Element with id="root" not found');
+  console.error('Рут не найден.');
 }
