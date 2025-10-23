@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Todo } from '../Types/todo'; 
+import { Todo } from '../Types/todo';
 import { api } from '../Services/api';
 
 export const useTodos = () => {
@@ -49,9 +49,9 @@ export const useTodos = () => {
         userId: 1,
         isLocal: true, 
       };
-      
+
       const response = await api.createTodo(newTodo);
-      
+
       setTodos([response.data, ...todos]);
     } catch (err: any) {
       setError(err.message || 'Failed to add todo');
@@ -63,36 +63,63 @@ export const useTodos = () => {
 
     if (!todo) return;
 
-    try {
-      const response = await api.updateTodo(id, { completed: !todo.completed });
+    if (todo.isLocal) {
+      setTodos(todos.map(t => (t.id === id ? { ...t, completed: !t.completed } : t)));
+      return;
+    }
 
-      setTodos(todos.map(t => (t.id === id ? response.data : t)));
+    try {
+      await api.updateTodo(id, { completed: !todo.completed });
+
+      setTodos(todos.map(t => (t.id === id ? { ...t, completed: !t.completed } : t)));
     } catch (err: any) {
-      setError('Failed to toggle todo status');
+      console.warn('Toggle failed, updating locally');
+
+      setTodos(todos.map(t => (t.id === id ? { ...t, completed: !t.completed } : t)));
     }
   };
 
   const editTodo = async (id: number, newText: string) => {
     const todo = todos.find(t => t.id === id);
-
+    
     if (!todo) return;
 
-    try {
-      const response = await api.updateTodo(id, { todo: newText });
+    if (todo.isLocal) {
+      setTodos(todos.map(t => (t.id === id ? { ...t, todo: newText } : t)));
 
-      setTodos(todos.map(t => (t.id === id ? response.data : t)));
+      return;
+    }
+
+    try {
+      await api.updateTodo(id, { todo: newText });
+
+      setTodos(todos.map(t => (t.id === id ? { ...t, todo: newText } : t)));
     } catch (err: any) {
-      setError('Failed to edit todo');
+      console.warn('Edit failed, updating locally');
+
+      setTodos(todos.map(t => (t.id === id ? { ...t, todo: newText } : t)));
     }
   };
 
   const deleteTodo = async (id: number) => {
+    const todo = todos.find(t => t.id === id);
+
+    if (!todo) return;
+
+    if (todo.isLocal) {
+      setTodos(todos.filter(t => t.id !== id));
+
+      return;
+    }
+
     try {
       await api.deleteTodo(id);
 
       setTodos(todos.filter(t => t.id !== id));
     } catch (err: any) {
-      setError('Failed to delete todo');
+      console.warn('Delete failed, removing locally');
+
+      setTodos(todos.filter(t => t.id !== id));
     }
   };
 
