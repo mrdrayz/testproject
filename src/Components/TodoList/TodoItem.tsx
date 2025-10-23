@@ -56,9 +56,9 @@ export const TodoItem: React.FC<Props> = ({ todo, onToggle, onDelete, onEdit }) 
             autoFocus
           />
         ) : (
-          <span className={todo.completed ? 'line-through text-gray-500' : ''}>
+          <div className={`flex-grow ${todo.completed ? 'line-through text-gray-500' : ''} whitespace-pre-wrap break-words`}>
             {todo.todo}
-          </span>
+          </div>
         )}
       </div>
 
@@ -68,7 +68,7 @@ export const TodoItem: React.FC<Props> = ({ todo, onToggle, onDelete, onEdit }) 
             <button
               onClick={handleSave}
               className="w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center hover:bg-green-600 transition-all transform hover:scale-110"
-              title="Сохранить"
+              title="Save"
             >
               ✓
             </button>
@@ -76,7 +76,7 @@ export const TodoItem: React.FC<Props> = ({ todo, onToggle, onDelete, onEdit }) 
             <button
               onClick={handleCancel}
               className="w-8 h-8 bg-gray-300 text-gray-700 rounded-full flex items-center justify-center hover:bg-gray-400 transition-all transform hover:scale-110"
-              title="Отменить"
+              title="Cancel"
             >
               ✕
             </button>
@@ -86,7 +86,7 @@ export const TodoItem: React.FC<Props> = ({ todo, onToggle, onDelete, onEdit }) 
             <button
               onClick={handleEdit}
               className="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center hover:bg-blue-200 transition-all transform hover:scale-110"
-              title="Редактировать"
+              title="Edit"
             >
               ✏️
             </button>
@@ -94,7 +94,7 @@ export const TodoItem: React.FC<Props> = ({ todo, onToggle, onDelete, onEdit }) 
             <button
               onClick={() => onDelete(todo.id)}
               className="w-8 h-8 bg-red-100 text-red-600 rounded-full flex items-center justify-center hover:bg-red-200 transition-all transform hover:scale-110"
-              title="Удалить"
+              title="Delete"
             >
               🗑️
             </button>
