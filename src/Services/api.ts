@@ -8,5 +8,5 @@ export const api = {
   getTodoById: (id: number) => axios.get<Todo>(`${API_BASE}/${id}`),
   createTodo: (data: Omit<Todo, 'id'>) => axios.post<Todo>(`${API_BASE}/add`, data),
   updateTodo: (id: number, data: Partial<Todo>) => axios.put<Todo>(`${API_BASE}/${id}`, data),
-  deleteTodo: (id: number) => axios.delete<Todo>(`${API_BASE}/${id}`),
+  deleteTodo: (id: number) => axios.delete<Todo>(`${API_BASE}/${id}`)
 };

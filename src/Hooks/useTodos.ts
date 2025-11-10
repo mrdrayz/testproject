@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Todo } from '../Types/todo';
+import { Todo } from '../Types/todo'; 
 import { api } from '../Services/api';
+
+const LOCAL_STORAGE_KEY = 'userTodos';
 
 export const useTodos = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
@@ -8,17 +10,26 @@ export const useTodos = () => {
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<'all' | 'active' | 'completed'>('all');
 
+  const saveLocalTodosToStorage = (allTodos: Todo[]) => {
+    const localTodos = allTodos.filter(todo => todo.isLocal === true);
+   
+    console.log('Saving to localStorage:', localTodos);
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(localTodos));
+  };
+
   useEffect(() => {
     const fetchTodos = async () => {
       try {
         setLoading(true);
 
         const response = await api.getTodos();
-
         if (response.data && response.data.todos) {
-          const initialTodos = response.data.todos.map(todo => ({ ...todo, isLocal: false }));
+          const apiTodos: Todo[] = response.data.todos.map(todo => ({ ...todo, isLocal: false }));
 
-          setTodos(initialTodos);
+          const savedLocalTodos: Todo[] = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY) || '[]');
+          console.log('Loaded from localStorage:', savedLocalTodos); 
+
+          setTodos([...apiTodos, ...savedLocalTodos]);
         } else {
           throw new Error('Invalid API response format');
         }
@@ -34,92 +45,68 @@ export const useTodos = () => {
 
   const filteredTodos = todos.filter(todo => {
     if (filter === 'active') return !todo.completed;
-
     if (filter === 'completed') return todo.completed;
-
     return true;
   });
 
-  const addTodo = async (text: string) => {
-    try {
-      const newTodo: Todo = {
-        id: Date.now(), 
-        todo: text,
-        completed: false,
-        userId: 1,
-        isLocal: true, 
-      };
+  const addTodo = (text: string) => { 
+    const newLocalTodo: Todo = {
+      id: Date.now(), 
+      todo: text,
+      completed: false,
+      userId: 1,
+      isLocal: true
+    };
 
-      const response = await api.createTodo(newTodo);
+    const updatedTodos = [newLocalTodo, ...todos];
+    setTodos(updatedTodos);
 
-      setTodos([response.data, ...todos]);
-    } catch (err: any) {
-      setError(err.message || 'Failed to add todo');
+    saveLocalTodosToStorage(updatedTodos);
+  };
+
+  const toggleTodo = (id: number) => { 
+    const todo = todos.find(t => t.id === id);
+    if (!todo) return;
+
+    const updatedTodos = todos.map(t => 
+      t.id === id 
+        ? { ...t, completed: !t.completed } 
+        : t
+    );
+
+    setTodos(updatedTodos);
+
+    if (todo.isLocal) {
+      saveLocalTodosToStorage(updatedTodos);
     }
   };
 
-  const toggleTodo = async (id: number) => {
+  const editTodo = (id: number, newText: string) => { 
     const todo = todos.find(t => t.id === id);
-
     if (!todo) return;
 
+    const updatedTodos = todos.map(t => 
+      t.id === id 
+        ? { ...t, todo: newText } 
+        : t
+    );
+
+    setTodos(updatedTodos);
+
     if (todo.isLocal) {
-      setTodos(todos.map(t => (t.id === id ? { ...t, completed: !t.completed } : t)));
-      return;
-    }
-
-    try {
-      await api.updateTodo(id, { completed: !todo.completed });
-
-      setTodos(todos.map(t => (t.id === id ? { ...t, completed: !t.completed } : t)));
-    } catch (err: any) {
-      console.warn('Toggle failed, updating locally');
-
-      setTodos(todos.map(t => (t.id === id ? { ...t, completed: !t.completed } : t)));
+      saveLocalTodosToStorage(updatedTodos);
     }
   };
 
-  const editTodo = async (id: number, newText: string) => {
+  const deleteTodo = (id: number) => {
     const todo = todos.find(t => t.id === id);
-    
     if (!todo) return;
 
-    if (todo.isLocal) {
-      setTodos(todos.map(t => (t.id === id ? { ...t, todo: newText } : t)));
-
-      return;
-    }
-
-    try {
-      await api.updateTodo(id, { todo: newText });
-
-      setTodos(todos.map(t => (t.id === id ? { ...t, todo: newText } : t)));
-    } catch (err: any) {
-      console.warn('Edit failed, updating locally');
-
-      setTodos(todos.map(t => (t.id === id ? { ...t, todo: newText } : t)));
-    }
-  };
-
-  const deleteTodo = async (id: number) => {
-    const todo = todos.find(t => t.id === id);
-
-    if (!todo) return;
+    const updatedTodos = todos.filter(t => t.id !== id);
+    setTodos(updatedTodos);
 
     if (todo.isLocal) {
-      setTodos(todos.filter(t => t.id !== id));
-
-      return;
-    }
-
-    try {
-      await api.deleteTodo(id);
-
-      setTodos(todos.filter(t => t.id !== id));
-    } catch (err: any) {
-      console.warn('Delete failed, removing locally');
-
-      setTodos(todos.filter(t => t.id !== id));
+      saveLocalTodosToStorage(updatedTodos);
     }
   };
 
